@@ -120,17 +120,11 @@ function addDepartment() {
                 message: 'Type the name of the department you wish to add:'
             }
         ]).then((answer) => {
-            connection.query(
-                'INSERT INTO department VALUES (DEFAULT, ?',
-                [answer.department],
-                (err) => {
-                    if(err) throw err;
-                    console.log ('Updated successfully');
-                    startUp();
-                }
-            )
-        })
-}
+            db.addDepartment(answer)
+            .then(() => console.log(`${answer} added successfully`))
+            .then(() => startUp());
+                })
+        }
 
 function addRole() {
     inquirer
