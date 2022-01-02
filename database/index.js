@@ -7,14 +7,14 @@ class Database {
 
     getAllEmployees() {
         return this.connection.promise().query(
-            `SELECT e.id AS ID, e.first_name AS First, e.last_name AS Last, e.role_id AS title, r.salary AS Salary, m.last_name AS Manager, d.name AS Department
-        FROM employee e 
-            LEFT JOIN employee m
-                ON e.manager_id = m.id
-            LEFT JOIN role r
-                ON e.role_id = r.title
-            LEFT JOIN department d
-                ON r.department_id - d.id`
+            `SELECT employee.id AS ID, employee.first_name AS First, employee.last_name AS Last, role.title, role.salary AS Salary, manager.last_name AS Manager, department.name AS Department
+        FROM employee 
+            LEFT JOIN employee manager
+                ON manager.id = employee.manager_id
+            LEFT JOIN role
+                ON employee.role_id = role.id
+            LEFT JOIN department
+                ON role.department_id = department.id`
         );
     }
 
@@ -24,7 +24,7 @@ class Database {
 
     getAllDepartments() {
         return this.connection.promise().query(
-        'SELECT d.id AS ID, d.name AS Department Name FROM department;'
+        'SELECT department.id AS ID, department.name FROM department;'
         );
     }
 
@@ -36,7 +36,7 @@ class Database {
 
     getAllRoles() {
         return this.connections.promise().query(
-           'SELECT r.id AS ID, r.title AS title, d.name AS department, r.salary FROM role LEFT JOIN department on r.department_id = d.id;' 
+           'SELECT role.id AS ID, role.title AS title, department.name AS department, role.salary FROM role LEFT JOIN department on role.department_id = department.id;' 
         );
     }
 
