@@ -1,9 +1,9 @@
 // Required dependencies
 const connection = require ("./connection");
 const inquirer = require ("inquirer");
-const consoleTable = require ("console.table");
-const repl = require("repl");
+const db = require('./Content/database');
 
+startUp();
 
 function startUp() {
     inquirer
@@ -40,18 +40,18 @@ function view() {
             type: 'list',
             name: 'view',
             message: 'Which would you like to view?',
-            choices: ['All employees', 'By department', 'By role']
+            choices: ['All employees', 'All departments', 'All roles']
             }
         ]).then((res) => {
             switch (res.view) {
                 case 'All employees':
                     viewAllEmployees();
                     break;
-                case 'By department':
-                    viewByDepartment();
+                case 'All departments':
+                    viewAllDepartments();
                     break;
-                case 'By role':
-                    viewByRole();
+                case 'All roles':
+                    viewAllRoles();
                 default:
                     console.log('Thank you');
             }
@@ -59,13 +59,30 @@ function view() {
 }
 
 function viewAllEmployees() {
-    const query =
-        
-    connection.query(query, (err, results) => {
-        if (err) throw err;
-        console.table (results);
-        startUp();
-    });
+    db.getAllEmployees()
+    .then(([rows]) => {
+        let employees = rows;
+        console.table(employees);
+    })
+    .then(() => startUp());
+}
+
+function viewAllDepartments() {
+    db.getAllDepartments()
+    .then(([rows]) => {
+        let departments = rows;
+        console.table(departments);
+    })
+    .then(() => startUp());
+}
+
+function viewAllRoles() {
+    db.getAllRoles()
+    .then(([rows]) => {
+        let roles = rows;
+        console.table(roles);
+    })
+    .then(() => startUp());
 }
 
 function add() {
