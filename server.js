@@ -27,6 +27,7 @@ function startUp() {
                     break;
                 case 'Quit':
                     console.log ('Completed');
+                    quit();
                 default:
                     console.log ('Thank you for your attention')
             }
@@ -121,12 +122,21 @@ function addDepartment() {
             }
         ]).then((answer) => {
             db.addDepartment(answer)
-            .then(() => console.log(`${answer} added successfully`))
+            .then(() => console.log(`Department added successfully`))
             .then(() => startUp());
                 })
         }
 
 function addRole() {
+    db.getAllDepartments()
+    .then(([rows]) => {
+        let departments = rows;
+        const deptChoices = departments.map(({ id, name }) => ({
+            name: name,
+            value: id
+        }));
+    })
+    
     inquirer
         .prompt([
             {
@@ -147,36 +157,19 @@ function addRole() {
             },
             {
                 name: 'department_id',
-                type: 'number',
-                message: 'Input department ID here',
-                validate: (value) => {
-                    if(isNaN(value) === false) {
-                        return true;
-                    }
-                    return false;
-                    }
+                type: 'list',
+                message: 'Select the department for your role',
+                choices: deptChoices
             }
         ]).then((answer) => {
-            connection.query(
-                'INSERT INTO role SET ?',
-                {
-                    title: answer.role,
-                    salary: answer.salary,
-                    department_id: answer.department_id
-                },
-                (err) => {
-                    if(err) throw err;
-                    console.log ('Updated successfully');
-                    startUp();
-                }
-            )
+            db.addRole(answer)
+            .then(() => console.log('Role added successfully'))
+            .then(() => startUp())
         })
 }
 
 function addEmployee() {
-    connection.query ('SELECT * FROM role', (err, res) => {
-        if(err) throw err;
-        inquirer
+      inquirer
         .prompt([
             {
                 name: 'first',
@@ -187,46 +180,64 @@ function addEmployee() {
                 name: 'last',
                 type: 'input',
                 message: 'Input employee last name here:'
-            },
-            {
-                name: 'role',
-                type: 'rawlist',
-                choices: function() {
-                    const choiceArray = [];
-                    for (i = 0; i < res.length; i++) {
-                        choiceArray.push(res[i].title)
-                    }
-                    return choiceArray;
-                },
-                message: 'Choose a title:'
-            },
-            {
-                name: 'manager',
-                type: 'number',
-                validate: (value) => {
-                    if(isNaN(value) === false) {
-                        return true;
-                    }
-                    return false;
-                },
-                message: 'Input manager ID here:',
-                default: '1'
             }
-        ]).then ((answer) => {
-            connection.query(
-                'INSERT INTO employee SET ?',
-                {
-                    first_name: answer.firstName,
-                    last_name: answer.lastName,
-                    role_id: answer.role,
-                    manager_id: answer.manager
-                }
-            )
-            console.log ("Succesful Add");
-            startUp()
-        });
-    });
-}
+        ]).then(answer => {
+            let firstName = answer.first;
+            let lastName = answer.last;
+
+            db.getAllRoles()
+            .then(([rows]) => {
+                let roles = rows;
+                const roleList = roles.map(({ id, title }) => ({
+                    name: title,
+                    value: id
+                }));
+
+                inquirer.prompt({
+                    name: 'roleId',
+                    type: 'list',
+                    message: 'Select employee role',
+                    choices: roleList
+                })
+                .then(answer => {
+                    let roleId = answer.roleId;
+
+                    db.getAllEmployees()
+                    .then(([rows]) => {
+                        let employees = rows;
+                        const managerList = employees.map(({ id, first, last}) => ({
+                            name: `${first} ${last}`,
+                            value: id
+                        }));
+
+                        managerList.unshift({ name: 'None', value: null});
+
+                        inquirer.prompt({
+                            name: 'managerId',
+                            type: 'list',
+                            message: 'Select the manager for your employee',
+                            choices: managerList
+                        })
+                        .then(answer => {
+                            let employee = {
+                                manager_id: answer.managerId,
+                                role_id: roleId,
+                                first: firstName,
+                                last: lastName
+                            }
+
+                            db.addEmployee(employee);
+                        })
+                        .then(() => console.log ('New employee added successfully'))
+                        .then(() => startUp())
+                    })
+                })
+            })
+        })
+
+
+    }
+
 
 function updateEmployee(){
     connection.query ('SELECT * FROM employee',
