@@ -1,7 +1,7 @@
 // Required dependencies
-const connection = require ("./connection");
 const inquirer = require ("inquirer");
-const db = require('./Content/database');
+const db = require('./database')
+require('console.table');
 
 startUp();
 
