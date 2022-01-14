@@ -42,7 +42,7 @@ class Database {
 
     addRole(role) {
         return this.connection.promise().query(
-            'INSERT INTO role SET ?', role
+            'INSERT INTO role SET title=?', role
         );
     }
 

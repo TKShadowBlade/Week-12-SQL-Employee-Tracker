@@ -10,7 +10,7 @@ CREATE TABLE department (
 CREATE TABLE role (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) UNIQUE NOT NULL,
-    salary DECIMAL UNSIGNED NOT NULL,
+    salary DECIMAL UNSIGNED DEFAULT '0',
     department_id INT UNSIGNED NOT NULL,
     INDEX dep_ind (department_id)
 );

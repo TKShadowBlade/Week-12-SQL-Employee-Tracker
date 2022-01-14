@@ -146,13 +146,13 @@ function addRole() {
             {
                 name: 'salary',
                 type: 'number',
-                message: 'Input salary here:',
-                validate: (value) => {
-                    if(isNaN(value) === false) {
-                        return true;
-                    }
-                    return false;
-                    }
+                message: 'Input salary here:'
+                // validate: (value) => {
+                //     if(isNaN(value) === false) {
+                //         return true;
+                //     }
+                //     return false;
+                //     }
             },
             {
                 name: 'department_id',
@@ -161,7 +161,7 @@ function addRole() {
                 choices: deptChoices
             }
         ]).then((answer) => {
-            db.addRole(answer)
+            db.addRole(answer.role)
             .then(() => console.log('Role added successfully'))
             .then(() => startUp())
         })
