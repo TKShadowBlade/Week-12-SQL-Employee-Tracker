@@ -121,7 +121,7 @@ function addDepartment() {
                 message: 'Type the name of the department you wish to add:'
             }
         ]).then((answer) => {
-            db.addDepartment(answer)
+            db.addDepartment(answer.department)
             .then(() => console.log(`Department added successfully`))
             .then(() => startUp());
                 })
@@ -135,7 +135,6 @@ function addRole() {
             name: name,
             value: id
         }));
-    })
     
     inquirer
         .prompt([
@@ -166,31 +165,33 @@ function addRole() {
             .then(() => console.log('Role added successfully'))
             .then(() => startUp())
         })
+    })
 }
 
 function addEmployee() {
       inquirer
         .prompt([
             {
-                name: 'first',
+                name: 'first_name',
                 type: 'input',
                 message: 'Input employee first name here:'
             },
             {
-                name: 'last',
+                name: 'last_name',
                 type: 'input',
                 message: 'Input employee last name here:'
             }
         ]).then(answer => {
-            let firstName = answer.first;
-            let lastName = answer.last;
+            let firstName = answer.first_name;
+            let lastName = answer.last_name;
 
             db.getAllRoles()
             .then(([rows]) => {
+               // console.log(rows);
                 let roles = rows;
-                const roleList = roles.map(({ id, title }) => ({
+                const roleList = roles.map(({ ID, title }) => ({
                     name: title,
-                    value: id
+                    value: ID
                 }));
 
                 inquirer.prompt({
@@ -205,8 +206,8 @@ function addEmployee() {
                     db.getAllEmployees()
                     .then(([rows]) => {
                         let employees = rows;
-                        const managerList = employees.map(({ id, first, last}) => ({
-                            name: `${first} ${last}`,
+                        const managerList = employees.map(({ id, first_name, last_name}) => ({
+                            name: `${first_name} ${last_name}`,
                             value: id
                         }));
 
@@ -222,8 +223,8 @@ function addEmployee() {
                             let employee = {
                                 manager_id: answer.managerId,
                                 role_id: roleId,
-                                first: firstName,
-                                last: lastName
+                                first_name: firstName,
+                                last_name: lastName
                             }
 
                             db.addEmployee(employee);
@@ -240,7 +241,7 @@ function addEmployee() {
 
 
 function updateEmployee(){
-    db.updateRole()
+    db.getAllEmployees()
         .then(([rows]) => {
             let employees = rows;
             const empChoices = employees.map(({ id, first_name, last_name }) => ({
